@@ -2,6 +2,7 @@ package orgs
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/grafana/grafana/pkg/bus"
 	"github.com/grafana/grafana/pkg/infra/log"
@@ -51,6 +52,14 @@ func (provisioner *OrgProvisioner) apply(cfg *configs) error {
 			provisioner.log.Debug("updating org from configuration", "id", org.Id, "name", org.Name)
 			updateCmd := createUpdateCommand(org)
 			if err := bus.Dispatch(updateCmd); err != nil {
+				return err
+			}
+		}
+
+		if savePreferencesCmd := createSavePreferencesCommand(org); savePreferencesCmd != nil {
+			provisioner.log.Debug("updating org preferences from configuration", "id", org.Id, "name", org.Name)
+			fmt.Println(savePreferencesCmd)
+			if err := bus.Dispatch(savePreferencesCmd); err != nil {
 				return err
 			}
 		}
